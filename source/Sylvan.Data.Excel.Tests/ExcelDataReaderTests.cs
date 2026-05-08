@@ -1843,6 +1843,80 @@ public partial class XlsxTests
 		// the time component.
 		Assert.Equal(new DateTime(1, 1, 1, 3, 23, 53, 605), dt);
 	}
+
+	class Col : DbColumn
+	{
+		public Col(Type type)
+		{
+			this.DataType = type;
+			this.DataTypeName = type.Name;
+			this.AllowDBNull = false;
+		}
+	}
+	class DecimalOnlySchema : IExcelSchemaProvider
+	{
+		static readonly Col col = new Col(typeof(decimal));
+
+		public DbColumn GetColumn(string sheetName, string name, int ordinal)
+		{
+			return col;
+		}
+
+		public int GetFieldCount(ExcelDataReader reader)
+		{
+			return reader.RowFieldCount;
+		}
+
+		public bool HasHeaders(string sheetName)
+		{
+			return false;
+		}
+	}
+
+	[Fact]
+	public void SchemaNumbers()
+	{
+		// providing a schema is primarily meant to 
+		// allow consumers to interrogate the metdata
+		// (GetFieldType, etc), and affect what is 
+		// returned from GetValue calls, which should
+		// be a (boxed) value of the schema-defined type
+
+		var schema = new DecimalOnlySchema();
+		var opt = new ExcelDataReaderOptions { 
+			Schema = schema 
+			//Schema = ExcelSchema.NoHeaders
+		};
+		var file = GetFile("Numbers");
+		var edr = ExcelDataReader.Create(file, opt);
+
+		edr.Read();
+
+		Assert.Equal(3.3m, edr.GetDecimal(0));
+		Assert.Equal(3.3m, edr.GetValue(0));
+		Assert.Equal("3.3", edr.GetString(0));
+
+		Assert.Throws<InvalidCastException>(() => edr.GetDecimal(1));
+		Assert.Throws<InvalidCastException>(() => edr.GetValue(1));
+		// we can still get the string representation of the double value.
+		Assert.Equal("1E+77", edr.GetString(1));
+
+		Assert.Equal(3.3333m, edr.GetDecimal(4));
+		Assert.Equal(3.3333m, edr.GetValue(4));
+		Assert.Equal("3.3333", edr.GetString(4));
+
+		Assert.Equal(150000000m, edr.GetDecimal(6));
+		Assert.Equal(150000000m, edr.GetValue(6));
+		Assert.Equal("150000000", edr.GetString(6));
+
+		Assert.Equal(0.00000015m, edr.GetDecimal(7));
+		Assert.Equal(0.00000015m, edr.GetValue(7));
+		// we get a string representing the double
+		// this can't be parsed into a decimal directly,
+		// but I think that's okay
+		Assert.Equal("1.5E-07", edr.GetString(7));
+	}
+
 #if NET6_0_OR_GREATER
 
 	[Fact]
@@ -1874,7 +1948,6 @@ public partial class XlsxTests
 		Assert.IsType<DateOnly>(edr.GetValue(1));
 		Assert.IsType<DateTime>(edr.GetValue(2));
 		Assert.IsType<TimeSpan>(edr.GetValue(3));
-
 	}
 
 #endif

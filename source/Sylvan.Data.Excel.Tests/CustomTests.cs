@@ -331,4 +331,24 @@ public class CustomTests
 		Assert.Equal("A", r.GetString(1));
 		Assert.Equal("C,D", r.GetString(2));
 	}
+
+	[Fact]
+	public void BadNumeric()
+	{
+		var reader = XlsxBuilder.Create(TestData.BadNumeric, opts: o => o.Schema = ExcelSchema.NoHeaders);
+
+		reader.Read();
+		// says it's numeric
+		Assert.True(reader.GetExcelDataType(0) == ExcelDataType.Numeric);
+		// but holds a bad value, can't be parsed as a double
+		Assert.Throws<FormatException>(() => reader.GetDouble(0));
+
+		// we also can't access it as a string.h
+		Assert.Throws<FormatException>(() => reader.GetString(0));
+		
+		Assert.Equal(0.0000015, reader.GetDouble(1));
+
+		// but when accessed as a string, we get a normalized string
+		Assert.Equal("1.5E-06",  reader.GetString(1));
+	}
 }
