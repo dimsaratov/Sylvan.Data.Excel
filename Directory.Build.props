@@ -10,7 +10,7 @@
 		<PackageLicenseFile>license.txt</PackageLicenseFile>
 		<LangVersion>13.0</LangVersion>
 
-		<RepositoryUrl>https://github.com/MarkPflug/Sylvan.Data.Excel</RepositoryUrl>
+		<RepositoryUrl>https://github.com/dimsaratov/Sylvan.Data.Excel</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>

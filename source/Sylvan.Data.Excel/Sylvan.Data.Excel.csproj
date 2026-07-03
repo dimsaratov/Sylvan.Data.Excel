@@ -10,6 +10,9 @@
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<RepositoryUrl>https://github.com/dimsaratov/Sylvan.Data.Excel</RepositoryUrl>
+		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+		<Title>$(AssemblyName)</Title>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework) == 'netstandard2.1'">
@@ -26,6 +29,6 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="$(TargetFramework) != 'netstandard2.0'">
-		<PackageReference Include="Sylvan.IsoDate" Version="0.1.5" PrivateAssets="all"/>
+		<PackageReference Include="Sylvan.IsoDate" Version="0.1.5" PrivateAssets="all" />
 	</ItemGroup>
 </Project>
